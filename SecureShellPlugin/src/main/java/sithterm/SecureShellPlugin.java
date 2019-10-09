@@ -51,9 +51,6 @@ public class SecureShellPlugin extends SithTermPlugin {
 		s.initialize("");
 	}
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private Map<String, Serializable> mySettings = new HashMap<>();
 
@@ -95,7 +92,6 @@ public class SecureShellPlugin extends SithTermPlugin {
 		}
 		// TODO add ssh settings to settings UI 
 		populateSettingsWindow();
-		
 		//TODO add save/restore sessions for ssh sessions
 	}
 
@@ -424,7 +420,6 @@ public class SecureShellPlugin extends SithTermPlugin {
 	@Override
 	public void remove() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
