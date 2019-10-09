@@ -26,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -34,9 +35,14 @@ import com.pty4j.PtyProcess;
 import com.pty4j.PtyProcessBuilder;
 
 public class SecureShellPlugin extends SithTermPlugin {
+	private static final String SECURE_SHELL_PLUGIN_FILES = "SecureShellPluginFiles";
 	private static final String DOT_SITH = ".Sith";
 	private int tabNumber = 1;
-
+	private JPanel sshSettingsPanel = new JPanel();
+	private static final String[] intFiles = { "msys-2.0.dll", "msys-asn1-8.dll", "msys-com_err-1.dll", "msys-crypt-0.dll",
+			"msys-crypto-1.0.0.dll", "msys-gcc_s-seh-1.dll", "msys-gssapi-3.dll", "msys-heimbase-1.dll",
+			"msys-heimntlm-0.dll", "msys-hx509-5.dll", "msys-krb5-26.dll", "msys-roken-18.dll",
+			"msys-sqlite3-0.dll", "msys-ssp-0.dll", "msys-wind-0.dll", "msys-z.dll", "ssh.exe", };
 	public static void main(String[] args) {//used during testing only
 
 		SithTermPlugin s = new SecureShellPlugin(new SithTermMainWindow());
@@ -69,7 +75,6 @@ public class SecureShellPlugin extends SithTermPlugin {
 		if (typeSafe) {
 			mySettings = tmpMySettings;
 		}
-		// TODO add ssh settings to settings UI 
 		JMenuItem newSshTab = new JMenuItem("New SSH Tab");
 		this.getApplication().getMnTabs().add(newSshTab);
 		newSshTab.addActionListener(evt -> {
@@ -84,20 +89,70 @@ public class SecureShellPlugin extends SithTermPlugin {
 			extractFilesFromJar(jarName);
 		}
 		File filesDir = new File( this.getApplication().getSettings().getDir()
-		+ File.separator + DOT_SITH + File.separator + "SecureShellPluginFiles");
+		+ File.separator + DOT_SITH + File.separator + SECURE_SHELL_PLUGIN_FILES);
 		if (!filesDir.exists()) {
 			filesDir.mkdirs();
 		}
+		// TODO add ssh settings to settings UI 
+		populateSettingsWindow();
+		
 		//TODO add save/restore sessions for ssh sessions
+	}
+
+	private void populateSettingsWindow() {
+		SettingsPopup pop = this.getApplication().getSpop();
+		if (null == pop) {
+			pop = new SettingsPopup("JediTerm Settings", this.getApplication());
+			pop.setBounds(50, 50, 700, 700);
+			this.getApplication().setSpop(pop);
+		}
+		pop.getTabbedPane().add("SSH Plugin", sshSettingsPanel);
+	}
+
+	public int getTabNumber() {
+		return tabNumber;
+	}
+
+	public void setTabNumber(int tabNumber) {
+		this.tabNumber = tabNumber;
+	}
+
+	public JPanel getSshSettingsPanel() {
+		return sshSettingsPanel;
+	}
+
+	public void setSshSettingsPanel(JPanel sshSettingsPanel) {
+		this.sshSettingsPanel = sshSettingsPanel;
+	}
+
+	public Map<String, Serializable> getMySettings() {
+		return mySettings;
+	}
+
+	public void setMySettings(Map<String, Serializable> mySettings) {
+		this.mySettings = mySettings;
+	}
+
+	public static String getSecureShellPluginFiles() {
+		return SECURE_SHELL_PLUGIN_FILES;
+	}
+
+	public static String getDotSith() {
+		return DOT_SITH;
+	}
+
+	public static String[] getIntfiles() {
+		return intFiles;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 	private void extractFilesFromJar(String jarName) {
 		try (JarFile jar = new JarFile(new File(jarName));) {
 
-			String[] intFiles = { "msys-2.0.dll", "msys-asn1-8.dll", "msys-com_err-1.dll", "msys-crypt-0.dll",
-					"msys-crypto-1.0.0.dll", "msys-gcc_s-seh-1.dll", "msys-gssapi-3.dll", "msys-heimbase-1.dll",
-					"msys-heimntlm-0.dll", "msys-hx509-5.dll", "msys-krb5-26.dll", "msys-roken-18.dll",
-					"msys-sqlite3-0.dll", "msys-ssp-0.dll", "msys-wind-0.dll", "msys-z.dll", "ssh.exe", };
+			
 			for (String s : intFiles) {
 				JarEntry jarEntry = jar.getJarEntry(s);
 
@@ -105,7 +160,7 @@ public class SecureShellPlugin extends SithTermPlugin {
 					try (ReadableByteChannel rbc = Channels
 							.newChannel(new URL("jar:file:" + jarName + "!/" + s).openStream())) {
 						try (FileOutputStream fos = new FileOutputStream(this.getApplication().getSettings().getDir()
-								+ File.separator + DOT_SITH + File.separator +  "SecureShellPluginFiles"+ File.separator+s)) {
+								+ File.separator + DOT_SITH + File.separator +  SECURE_SHELL_PLUGIN_FILES+ File.separator+s)) {
 							fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 							fos.flush();
 						}
@@ -119,11 +174,7 @@ public class SecureShellPlugin extends SithTermPlugin {
 
 	private void extractFilesAsResources() {
 		try {
-			String[] intFiles = { "msys-2.0.dll", "msys-asn1-8.dll", "msys-com_err-1.dll", "msys-crypt-0.dll",
-					"msys-crypto-1.0.0.dll", "msys-gcc_s-seh-1.dll", "msys-gssapi-3.dll", "msys-heimbase-1.dll",
-					"msys-heimntlm-0.dll", "msys-hx509-5.dll", "msys-krb5-26.dll", "msys-roken-18.dll",
-					"msys-sqlite3-0.dll", "msys-ssp-0.dll", "msys-wind-0.dll", "msys-z.dll", "ssh.exe", };
-
+		
 			for (String s : intFiles) {
 				Enumeration<URL> res = Thread.currentThread().getContextClassLoader().getResources(s);
 				while (res.hasMoreElements()) {
@@ -132,7 +183,7 @@ public class SecureShellPlugin extends SithTermPlugin {
 
 					try (ReadableByteChannel rbc = Channels.newChannel(resUrl.openStream())) {
 						try (FileOutputStream fos = new FileOutputStream(this.getApplication().getSettings().getDir()
-								+ File.separator + DOT_SITH + File.separator +"SecureShellPluginFiles"+ File.separator+s)) {
+								+ File.separator + DOT_SITH + File.separator +SECURE_SHELL_PLUGIN_FILES+ File.separator+s)) {
 							fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 							fos.flush();
 						}
@@ -158,7 +209,7 @@ public class SecureShellPlugin extends SithTermPlugin {
 		return typeSafe;
 	}
 
-	public Component getWidget() {
+	private Component getWidget() {
 		JediTermWidget jtw = new JediTermWidget(new SithSettingsProvider(this.getApplication().getSettings()));
 		jtw.setBackground(this.getApplication().getSettings().getBgColor());
 		jtw.setForeground(this.getApplication().getSettings().getFgColor());
@@ -299,7 +350,7 @@ public class SecureShellPlugin extends SithTermPlugin {
 		// host:port] [-w local_tun[:remote_tun]]
 		connectButton.addActionListener(evt -> {
 			String exe = this.getApplication().getSettings().getDir() + File.separator + DOT_SITH + File.separator
-					+ "SecureShellPluginFiles"+File.separator+"ssh.exe";
+					+ SECURE_SHELL_PLUGIN_FILES+File.separator+"ssh.exe";
 			List<String> command = new LinkedList<>();
 			command.add(exe);
 			command.add("-p");
@@ -331,8 +382,13 @@ public class SecureShellPlugin extends SithTermPlugin {
 				for (String s : command) {
 					SithTermMainWindow.getLogger().debug(s);
 				}
-				proc = new PtyProcessBuilder((String[]) command.toArray(new String[0])).setConsole(false)
-						.setCygwin(false).setDirectory(".").setEnvironment(myEnv).start();
+				PtyProcessBuilder pb = new PtyProcessBuilder((String[]) command.toArray(new String[0]))
+						.setConsole(this.getApplication().getSettings().isConsole())
+						.setCygwin(this.getApplication().getSettings().isCygwin())
+						.setDirectory(this.getApplication().getSettings().getDir())
+						.setEnvironment(myEnv);
+				
+				proc = pb.start();
 				SshTtyConnector conn = new SshTtyConnector(proc, StandardCharsets.UTF_8);
 				jtw.setTtyConnector(conn);
 				jtw.start();
