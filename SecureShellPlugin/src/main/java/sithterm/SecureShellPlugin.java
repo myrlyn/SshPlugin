@@ -27,6 +27,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -39,6 +40,7 @@ public class SecureShellPlugin extends SithTermPlugin {
 	private static final String DOT_SITH = ".Sith";
 	private int tabNumber = 1;
 	private JPanel sshSettingsPanel = new JPanel();
+	private JTabbedPane sshTabs = new JTabbedPane();
 	private static final String[] intFiles = { "msys-2.0.dll", "msys-asn1-8.dll", "msys-com_err-1.dll", "msys-crypt-0.dll",
 			"msys-crypto-1.0.0.dll", "msys-gcc_s-seh-1.dll", "msys-gssapi-3.dll", "msys-heimbase-1.dll",
 			"msys-heimntlm-0.dll", "msys-hx509-5.dll", "msys-krb5-26.dll", "msys-roken-18.dll",
@@ -103,6 +105,11 @@ public class SecureShellPlugin extends SithTermPlugin {
 			this.getApplication().setSpop(pop);
 		}
 		pop.getTabbedPane().add("SSH Plugin", sshSettingsPanel);
+		sshSettingsPanel.add( sshTabs);
+		JPanel connectionsPane = new JPanel();
+		connectionsPane.setLayout(new GridBagLayout());
+		sshTabs.addTab("Connection Settings", connectionsPane);
+		
 	}
 
 	public int getTabNumber() {
